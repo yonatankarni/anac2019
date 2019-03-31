@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>bandana</artifactId>
+
+  <parent>
+    <groupId>org.biu.anac</groupId>
+    <artifactId>anac2019</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.biu.anac</groupId>
+      <artifactId>ourAgent</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>bandana-framework</groupId>
+      <artifactId>bandana</artifactId>
+      <version>1.3.1</version>
+      <scope>system</scope>
+      <systemPath>
+        ${basedir}/../lib/bandana-1.3.1.jar
+      </systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>bot</groupId>
+      <artifactId>bot</artifactId>
+      <version>1.6</version>
+      <scope>system</scope>
+      <systemPath>
+        ${basedir}/../lib/bot-1.6.jar
+      </systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>commons</groupId>
+      <artifactId>commons-net</artifactId>
+      <version>3.3</version>
+      <scope>system</scope>
+      <systemPath>
+        ${basedir}/../lib/commons-net-3.3.jar
+      </systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>dip</groupId>
+      <artifactId>dip</artifactId>
+      <version>1.6</version>
+      <scope>system</scope>
+      <systemPath>
+        ${basedir}/../lib/dip-1.6.jar
+      </systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>jac</groupId>
+      <artifactId>jac</artifactId>
+      <version>0.8.1</version>
+      <scope>system</scope>
+      <systemPath>
+        ${basedir}/../lib/jac-0.8.1.jar
+      </systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>bandana</groupId>
+      <artifactId>NegotiationServer</artifactId>
+      <version>1.3.1</version>
+      <scope>system</scope>
+      <systemPath>
+        ${basedir}/../lib/NegotiationServer-1.3.1.jar
+      </systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>bandana</groupId>
+      <artifactId>tcpIpComm</artifactId>
+      <version>0.1.2</version>
+      <scope>system</scope>
+      <systemPath>
+        ${basedir}/../lib/tcpIpComm-0.1.2.jar
+      </systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>utilities</groupId>
+      <artifactId>utilities</artifactId>
+      <version>1.0.3</version>
+      <scope>system</scope>
+      <systemPath>
+        ${basedir}/../lib/utilities-1.0.3.jar
+      </systemPath>
+    </dependency>
+  </dependencies>
+</project>
