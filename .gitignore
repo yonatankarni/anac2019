@@ -1,4 +1,5 @@
 .idea/
-anac2019.iml
+*.iml
 target/
 log/
+bandana/agents/ourAgent*

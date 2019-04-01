@@ -18,7 +18,7 @@ public class MyTournamentRunner {
 	final static String[] dbrane_1_1_Command = {"java", "-jar", "agents/D-Brane-1.1.jar", "-log", "log", "-name", "D-Brane", "-fy", "1905"};
 	final static String[] dbraneExampleBotCommand = {"java", "-jar", "agents/D-BraneExampleBot.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1905"};
 
-	final static String[] anacExampleBotCommand = {"java", "-jar", "agents/AnacExampleNegotiator.jar", "-log", "log", "-name", "AnacExampleNegotiator", "-fy", "1905"};
+	final static String[] ourAgentCommand = {"java", "-jar", "agents/ourAgent-1.0-SNAPSHOT.jar", "-log", "log", "-name", "ourAgent", "-fy", "1905"};
 
 	
 	//Main folder where all the logs are stored. For each tournament a new folder will be created inside this folder
@@ -94,7 +94,10 @@ public class MyTournamentRunner {
 				String[] command;
 				
 				//make sure that each player has a different name.
-				if(i<2){
+				if(i<1) {
+					name = "OurAgent" + i;
+					command = ourAgentCommand;
+				} else if(i<2){
 					
 					name = "D-Brane " + i;
 					command = dbrane_1_1_Command; 
