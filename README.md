@@ -1,5 +1,5 @@
 # anac2019
-the going-to-Macau group dyplomacy agent - top secret!
+the going-to-Macau group diplomacy agent - top secret!
 
 ## Prerequisites:
 * Java 8
@@ -13,3 +13,10 @@ pip install parlance
 you will need to either edit the file ParlanceRunner.java, or pass parameters to the program (in intellij do this by going to "Run->edit configurations")
 
 run the TournamentRunner.main() and voilla.
+
+## running the tournament with our agent using maven:
+run the following from the project root dir:
+
+mvn initialize
+mvn clean install -pl ourAgent
+mvn clean install

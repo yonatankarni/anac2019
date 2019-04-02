@@ -18,30 +18,165 @@
         <artifactId>maven-jar-plugin</artifactId>
         <version>3.0.2</version>
         <configuration>
-          <outputDirectory>../bandana/agents</outputDirectory>
           <archive>
             <manifest>
-              <!--<addClasspath>true</addClasspath>-->
-              <!--<classpathPrefix>agents/</classpathPrefix>-->
+              <classpathPrefix>lib/</classpathPrefix>
               <mainClass>ddejonge.bandana.exampleAgents.OurAgentMain</mainClass>
             </manifest>
           </archive>
         </configuration>
       </plugin>
-      <!--<plugin>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
-        <!--<executions>-->
-          <!--<execution>-->
-            <!--<goals>-->
-              <!--<goal>repackage</goal>-->
-            <!--</goals>-->
-            <!--<configuration>-->
-              <!--<classifier>spring-boot</classifier>-->
-            <!--</configuration>-->
-          <!--</execution>-->
-        <!--</executions>-->
-      <!--</plugin>-->
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>../bandana/agents</outputDirectory>
+              <finalName>ourAgent</finalName>
+              <classifier>spring-boot</classifier>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- this is a hack in order to install system level dependencies in the local maven repo -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>hack-binary1</id>
+            <phase>initialize</phase>
+            <configuration>
+              <file>${basedir}/../lib/bandana-1.3.1.jar</file>
+              <repositoryLayout>default</repositoryLayout>
+              <groupId>bandana-framework</groupId>
+              <artifactId>bandana</artifactId>
+              <version>1.3.1</version>
+              <packaging>jar</packaging>
+              <generatePom>true</generatePom>
+            </configuration>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>hack-binary2</id>
+            <phase>initialize</phase>
+            <configuration>
+              <file>${basedir}/../lib/bot-1.6.jar</file>
+              <repositoryLayout>default</repositoryLayout>
+              <groupId>bot</groupId>
+              <artifactId>bot</artifactId>
+              <version>1.6</version>
+              <packaging>jar</packaging>
+              <generatePom>true</generatePom>
+            </configuration>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>hack-binary3</id>
+            <phase>initialize</phase>
+            <configuration>
+              <file>${basedir}/../lib/commons-net-3.3.jar</file>
+              <repositoryLayout>default</repositoryLayout>
+              <groupId>commons</groupId>
+              <artifactId>commons-net</artifactId>
+              <version>3.3</version>
+              <packaging>jar</packaging>
+              <generatePom>true</generatePom>
+            </configuration>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>hack-binary4</id>
+            <phase>initialize</phase>
+            <configuration>
+              <file>${basedir}/../lib/dip-1.6.jar</file>
+              <repositoryLayout>default</repositoryLayout>
+              <groupId>dip</groupId>
+              <artifactId>dip</artifactId>
+              <version>1.6</version>
+              <packaging>jar</packaging>
+              <generatePom>true</generatePom>
+            </configuration>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>hack-binary5</id>
+            <phase>initialize</phase>
+            <configuration>
+              <file>${basedir}/../lib/jac-0.8.1.jar</file>
+              <repositoryLayout>default</repositoryLayout>
+              <groupId>jac</groupId>
+              <artifactId>jac</artifactId>
+              <version>0.8.1</version>
+              <packaging>jar</packaging>
+              <generatePom>true</generatePom>
+            </configuration>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>hack-binary6</id>
+            <phase>initialize</phase>
+            <configuration>
+              <file>${basedir}/../lib/NegotiationServer-1.3.1.jar</file>
+              <repositoryLayout>default</repositoryLayout>
+              <groupId>bandana</groupId>
+              <artifactId>NegotiationServer</artifactId>
+              <version>1.3.1</version>
+              <packaging>jar</packaging>
+              <generatePom>true</generatePom>
+            </configuration>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>hack-binary7</id>
+            <phase>initialize</phase>
+            <configuration>
+              <file>${basedir}/../lib/tcpIpComm-0.1.2.jar</file>
+              <repositoryLayout>default</repositoryLayout>
+              <groupId>bandana</groupId>
+              <artifactId>tcpIpComm</artifactId>
+              <version>0.1.2</version>
+              <packaging>jar</packaging>
+              <generatePom>true</generatePom>
+            </configuration>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>hack-binary8</id>
+            <phase>initialize</phase>
+            <configuration>
+              <file>${basedir}/../lib/utilities-1.0.3.jar</file>
+              <repositoryLayout>default</repositoryLayout>
+              <groupId>utilities</groupId>
+              <artifactId>utilities</artifactId>
+              <version>1.0.3</version>
+              <packaging>jar</packaging>
+              <generatePom>true</generatePom>
+            </configuration>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
@@ -63,80 +198,48 @@
       <groupId>bandana-framework</groupId>
       <artifactId>bandana</artifactId>
       <version>1.3.1</version>
-      <scope>system</scope>
-      <systemPath>
-        ${basedir}/../lib/bandana-1.3.1.jar
-      </systemPath>
     </dependency>
 
     <dependency>
       <groupId>bot</groupId>
       <artifactId>bot</artifactId>
       <version>1.6</version>
-      <scope>system</scope>
-      <systemPath>
-        ${basedir}/../lib/bot-1.6.jar
-      </systemPath>
     </dependency>
 
     <dependency>
       <groupId>commons</groupId>
       <artifactId>commons-net</artifactId>
       <version>3.3</version>
-      <scope>system</scope>
-      <systemPath>
-        ${basedir}/../lib/commons-net-3.3.jar
-      </systemPath>
     </dependency>
 
     <dependency>
       <groupId>dip</groupId>
       <artifactId>dip</artifactId>
       <version>1.6</version>
-      <scope>system</scope>
-      <systemPath>
-        ${basedir}/../lib/dip-1.6.jar
-      </systemPath>
     </dependency>
 
     <dependency>
       <groupId>jac</groupId>
       <artifactId>jac</artifactId>
       <version>0.8.1</version>
-      <scope>system</scope>
-      <systemPath>
-        ${basedir}/../lib/jac-0.8.1.jar
-      </systemPath>
     </dependency>
 
     <dependency>
       <groupId>bandana</groupId>
       <artifactId>NegotiationServer</artifactId>
       <version>1.3.1</version>
-      <scope>system</scope>
-      <systemPath>
-        ${basedir}/../lib/NegotiationServer-1.3.1.jar
-      </systemPath>
     </dependency>
 
     <dependency>
       <groupId>bandana</groupId>
       <artifactId>tcpIpComm</artifactId>
       <version>0.1.2</version>
-      <scope>system</scope>
-      <systemPath>
-        ${basedir}/../lib/tcpIpComm-0.1.2.jar
-      </systemPath>
     </dependency>
 
     <dependency>
       <groupId>utilities</groupId>
       <artifactId>utilities</artifactId>
       <version>1.0.3</version>
-      <scope>system</scope>
-      <systemPath>
-        ${basedir}/../lib/utilities-1.0.3.jar
-      </systemPath>
     </dependency>
   </dependencies>
 </project>

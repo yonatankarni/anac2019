@@ -18,7 +18,7 @@ public class MyTournamentRunner {
 	final static String[] dbrane_1_1_Command = {"java", "-jar", "agents/D-Brane-1.1.jar", "-log", "log", "-name", "D-Brane", "-fy", "1905"};
 	final static String[] dbraneExampleBotCommand = {"java", "-jar", "agents/D-BraneExampleBot.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1905"};
 
-	final static String[] ourAgentCommand = {"java", "-jar", "agents/ourAgent-1.0-SNAPSHOT.jar", "-log", "log", "-name", "ourAgent", "-fy", "1905"};
+	final static String[] ourAgentCommand = {"java", "-jar", "agents/ourAgent-spring-boot.jar", "-log", "log", "-name", "ourAgent", "-fy", "1905"};
 
 	
 	//Main folder where all the logs are stored. For each tournament a new folder will be created inside this folder
