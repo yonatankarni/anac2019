@@ -17,6 +17,6 @@ run the TournamentRunner.main() and voilla.
 ## running the tournament with our agent using maven:
 run the following from the project root dir:
 
-mvn initialize
-mvn clean install -pl ourAgent
-mvn clean install
+* mvn initialize
+* mvn clean install -pl ourAgent
+* mvn clean install
