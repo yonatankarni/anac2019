@@ -19,7 +19,7 @@ public class MyTournamentRunner {
   final static String[] dbraneExampleBotCommand = {"java", "-jar", "agents/D-BraneExampleBot.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1905"};
 
   final static String[] ourAgentCommand = {"java", "-jar", "agents/ourAgent-spring-boot.jar", "-log", "log", "-name", "ourAgent", "-fy", "1905"};
-
+  final static String[] ourAgentCommandWithDebug = {"java", "-jar", "-agentlib:jdwp=transport=dt_socket,server=y,address=5005", "agents/ourAgent-spring-boot.jar", "-log", "log", "-name", "ourAgent", "-fy", "1905"};
 
   //Main folder where all the logs are stored. For each tournament a new folder will be created inside this folder
   // where the results of the tournament will be logged.
@@ -145,7 +145,11 @@ public class MyTournamentRunner {
     //make sure that each player has a different name.
     if (playerIdx < 1) {
       name = "OurAgent" + playerIdx;
-      command = ourAgentCommand;
+      if ("true".equals(System.getProperty("debug"))) {
+        command = ourAgentCommandWithDebug;
+      } else {
+        command = ourAgentCommand;
+      }
     } else if (playerIdx < 2) {
       name = "D-Brane " + playerIdx;
       command = dbrane_1_1_Command;

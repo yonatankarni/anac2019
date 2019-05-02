@@ -10,7 +10,14 @@ public class TournamentRunnerFirstStage extends MyTournamentRunner {
     String[] command;
 
     //make sure that each player has a different name.
-    if (playerIdx < 4) {
+    if (playerIdx < 1) {
+      name = "OurAgent" + playerIdx;
+      if ("true".equals(System.getProperty("debug"))) {
+        command = ourAgentCommandWithDebug;
+      } else {
+        command = ourAgentCommand;
+      }
+    } else if (playerIdx < 4) {
       name = "OurAgent" + playerIdx;
       command = ourAgentCommand;
     } else {
