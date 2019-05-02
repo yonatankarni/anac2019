@@ -20,3 +20,7 @@ run the following from the project root dir:
 * mvn initialize
 * mvn clean install -pl ourAgent
 * mvn clean install
+
+in order to debug the agent, replace the last step with:
+* mvn test -Ddebug=true
+and then connect via remote debug (on port 5005)
