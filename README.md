@@ -23,4 +23,5 @@ run the following from the project root dir:
 
 in order to debug the agent, replace the last step with:
 * mvn test -Ddebug=true
+
 and then connect via remote debug (on port 5005)
