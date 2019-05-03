@@ -25,3 +25,9 @@ in order to debug the agent, replace the last step with:
 * mvn test -Ddebug=true
 
 and then connect via remote debug (on port 5005)
+
+to run just the first stage test (4 vs. 3), run:
+mvn test -pl bandana -Dtest=MyTournamentRunnerTest#testRunTournamentFourVsThree
+
+and to run just the second stage test run:
+mvn test -pl bandana -Dtest=MyTournamentRunnerTest#testRunTournamentOneOfSeven
