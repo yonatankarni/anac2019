@@ -297,18 +297,16 @@ public class OurAgent extends ANACNegotiator {
 
 
     //get all units of the negotiating powers.
-    List<Region> units = new ArrayList<Region>();
-    for (Power power : aliveNegotiatingPowers) {
-      units.addAll(power.getControlledRegions());
-    }
+//    List<Region> units = new ArrayList<>();
+//    for (Power power : aliveNegotiatingPowers) {
+//      units.addAll(power.getControlledRegions());
+//    }
 
     final List<Power> allies = new LinkedList<>();
-    int k = 0;
     for (final Power power: aliveNegotiatingPowers) {
-      if (k < 3) {
+      if (senderInCoalition(power.getName())) {
         allies.add(power);
       }
-      k = k + 1;
 //      plan.get
       final Plan plan = this.dBraneTactics.determineBestPlan(this.game, power, this.getConfirmedDeals(), allies);
 
@@ -320,7 +318,7 @@ public class OurAgent extends ANACNegotiator {
       }
     }
 
-    final BasicDeal deal = new BasicDeal(myOrderCommitments, Collections.<DMZ>emptyList());
+    final BasicDeal deal = new BasicDeal(myOrderCommitments, Collections.emptyList());
 
     return deal;
 
