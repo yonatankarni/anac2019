@@ -12,8 +12,9 @@ import ddejonge.bandana.tools.Utilities;
 import ddejonge.negoServer.Message;
 import es.csic.iiia.fabregues.dip.board.Power;
 import es.csic.iiia.fabregues.dip.board.Region;
-import es.csic.iiia.fabregues.dip.orders.HLDOrder;
+import es.csic.iiia.fabregues.dip.orders.MTOOrder;
 import es.csic.iiia.fabregues.dip.orders.Order;
+import es.csic.iiia.fabregues.dip.orders.SUPMTOOrder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Vector;
 
 public class OurAgent extends ANACNegotiator {
 
@@ -28,7 +30,7 @@ public class OurAgent extends ANACNegotiator {
   DBraneTactics dBraneTactics;
 
   private boolean sentSync = false;
-  private final List<Power> sameAgentCoalition = new LinkedList<>();
+  private final List<Power> coalition = new LinkedList<>();
   //Constructor
 
   /**
@@ -116,7 +118,7 @@ public class OurAgent extends ANACNegotiator {
 
           // check if this is a sync proposal
           if (deal.getDemilitarizedZones().size() == game.getProvinces().size()) {
-            sameAgentCoalition.add(game.getPower(receivedMessage.getSender()));
+            coalition.add(game.getPower(receivedMessage.getSender()));
             this.rejectProposal(receivedProposal.getId());
             continue;
           }
@@ -256,7 +258,7 @@ public class OurAgent extends ANACNegotiator {
   }
 
   private boolean senderInCoalition(final String senderName) {
-    return sameAgentCoalition.contains(game.getPower(senderName));
+    return coalition.contains(game.getPower(senderName));
   }
 
 
@@ -293,151 +295,55 @@ public class OurAgent extends ANACNegotiator {
       return null;
     }
 
-    final List<OrderCommitment> myOrderCommitments = new ArrayList<>();
+    final List<OrderCommitment> finalOrderCommitments = new ArrayList<>();
+    final List<BasicDeal> finalDeals = new LinkedList<>(this.getConfirmedDeals());
 
-
-    //get all units of the negotiating powers.
-//    List<Region> units = new ArrayList<>();
-//    for (Power power : aliveNegotiatingPowers) {
-//      units.addAll(power.getControlledRegions());
-//    }
-
-    final List<Power> allies = new LinkedList<>();
     for (final Power power: aliveNegotiatingPowers) {
-      if (senderInCoalition(power.getName())) {
-        allies.add(power);
-      }
-//      plan.get
-      final Plan plan = this.dBraneTactics.determineBestPlan(this.game, power, this.getConfirmedDeals(), allies);
+      final Plan plan = this.dBraneTactics.determineBestPlan(this.game, power, finalDeals, coalition);
 
-//      Plan plan = this.dBraneTactics.determineBestPlan(this.game, this.me, this.getConfirmedDeals(), allies);
-//      System.out.println(plan.getMyOrders());
-      for (final Order order : plan.getMyOrders()) {
-        final OrderCommitment orderCommitment = new OrderCommitment(game.getYear(), game.getPhase(), order);
-        myOrderCommitments.add(orderCommitment);
+      if (Objects.nonNull(plan)) {
+        final List<Order> powerOrders = plan.getMyOrders();
+        for (final Order orderCandidate : powerOrders) {
+          final OrderCommitment orderCommitment = getCommitmentIfOrderCoherent(orderCandidate, finalOrderCommitments);
+          if (Objects.nonNull(orderCommitment)) {
+            finalOrderCommitments.add(orderCommitment);
+          }
+
+          if (orderCandidate instanceof MTOOrder && orderCandidate.getLocation().getProvince().isSC()) {
+            final Vector<Region> adjacentRegions = ((MTOOrder) orderCandidate).getDestination().getAdjacentRegions();
+            for (final Region adjacentRegion : adjacentRegions) {
+              final Power controller = game.getController(adjacentRegion);
+
+              if (coalition.contains(controller) && !controller.equals(orderCandidate.getPower())) {
+                final SUPMTOOrder supportMoveToOrderCandidate = new SUPMTOOrder(controller, adjacentRegion, (MTOOrder) orderCandidate);
+                final OrderCommitment supportMoveToOrderCommitment = getCommitmentIfOrderCoherent(supportMoveToOrderCandidate, finalOrderCommitments);
+                if (Objects.nonNull(supportMoveToOrderCommitment)) {
+                  finalOrderCommitments.add(supportMoveToOrderCommitment);
+                  break;
+                }
+              }
+            }
+          }
+        }
       }
     }
 
-    final BasicDeal deal = new BasicDeal(myOrderCommitments, Collections.emptyList());
+    return new BasicDeal(finalOrderCommitments, Collections.emptyList());
+  }
 
-    return deal;
+  private OrderCommitment getCommitmentIfOrderCoherent(final Order orderCandidate, final List<OrderCommitment> orderCommitments) {
+    final OrderCommitment orderCommitmentCandidate = new OrderCommitment(game.getYear(), game.getPhase(), orderCandidate);
+    final List<OrderCommitment> commitmentsCandidates = new LinkedList<>(orderCommitments);
+    commitmentsCandidates.add(orderCommitmentCandidate);
+    final List<BasicDeal> dealCandidates = new LinkedList<>(this.getConfirmedDeals());
+    dealCandidates.add(new BasicDeal(commitmentsCandidates, Collections.emptyList()));
 
-//    //Let's generate 3 random demilitarized zones.
-//    List<DMZ> demilitarizedZones = new ArrayList<DMZ>(3);
-////    for (int i = 0; i < 3; i++) {
-////
-////      //1. Create a list of powers
-////      ArrayList<Power> powers = new ArrayList<Power>(2);
-////
-////      //1a. add myself to the list
-////      powers.add(me);
-////
-////      //1b. add a random other power to the list.
-////      Power randomPower = me;
-////      while (randomPower.equals(me)) {
-////
-////        int numNegoPowers = aliveNegotiatingPowers.size();
-////        randomPower = aliveNegotiatingPowers.get(random.nextInt(numNegoPowers));
-////      }
-////      powers.add(randomPower);
-////
-////      //2. Create a list containing 3 random provinces.
-////      ArrayList<Province> provinces = new ArrayList<Province>();
-////      for (int j = 0; j < 3; j++) {
-////        int numProvinces = this.game.getProvinces().size();
-////        Province randomProvince = this.game.getProvinces().get(random.nextInt(numProvinces));
-////        provinces.add(randomProvince);
-////      }
-////
-////
-////      //This agent only generates deals for the current year and phase.
-////      // However, you can pick any year and phase here, as long as they do not lie in the past.
-////      // (actually, you can also propose deals for rounds in the past, but it doesn't make any sense
-////      //  since you obviously cannot obey such deals).
-////      demilitarizedZones.add(new DMZ(game.getYear(), game.getPhase(), powers, provinces));
-////
-////    }
-//
-//    //let's generate 3 random OrderCommitments
-//    List<OrderCommitment> randomOrderCommitments = new ArrayList<OrderCommitment>();
-//
-//
-//    //get all units of the negotiating powers.
-//    List<Region> units = new ArrayList<Region>();
-//    for (Power power : aliveNegotiatingPowers) {
-//      units.addAll(power.getControlledRegions());
-//    }
-//
-//
-//    for (int i = 0; i < 3; i++) {
-//
-//      //Pick a random unit and remove it from the list
-//      if (units.size() == 0) {
-//        break;
-//      }
-//      Region randomUnit = units.remove(random.nextInt(units.size()));
-//
-//      //Get the corresponding power
-//      Power power = game.getController(randomUnit);
-//
-//      //Determine a list of potential destinations for the unit.
-//      // a Region is a potential destination for a unit if it is adjacent to that unit (or it is the current location of the unit)
-//      //  and the Province is not demilitarized for the Power controlling that unit.
-//      List<Region> potentialDestinations = new ArrayList<Region>();
-//
-//      //Create a list of adjacent regions, including the current location of the unit.
-//      List<Region> adjacentRegions = new ArrayList<>(randomUnit.getAdjacentRegions());
-//      adjacentRegions.add(randomUnit);
-//
-//      for (Region adjacentRegion : adjacentRegions) {
-//
-//        Province adjacentProvince = adjacentRegion.getProvince();
-//
-//        //Check that the adjacent Region is not demilitarized for the power controlling the unit.
-//        boolean isDemilitarized = false;
-//        for (DMZ dmz : demilitarizedZones) {
-//          if (dmz.getPowers().contains(power) && dmz.getProvinces().contains(adjacentProvince)) {
-//            isDemilitarized = true;
-//            break;
-//          }
-//
-//        }
-//
-//        //If it is not demilitarized, then we can add the region to the list of potential destinations.
-//        if (!isDemilitarized) {
-//          potentialDestinations.add(adjacentRegion);
-//        }
-//      }
-//
-//
-//      int numPotentialDestinations = potentialDestinations.size();
-//      if (numPotentialDestinations > 0) {
-//
-//        Region randomDestination = potentialDestinations.get(random.nextInt(numPotentialDestinations));
-//
-//        Order randomOrder;
-//        if (randomDestination.equals(randomUnit)) {
-//          randomOrder = new HLDOrder(power, randomUnit);
-//        } else {
-//          randomOrder = new MTOOrder(power, randomUnit, randomDestination);
-//        }
-//        // Of course we could also propose random support orders, but we don't do that here.
-//
-//
-//        //We only generate deals for the current year and phase.
-//        // However, you can pick any year and phase here, as long as they do not lie in the past.
-//        // (actually, you can also propose deals for rounds in the past, but it doesn't make any sense
-//        //  since you obviously cannot obey such deals).
-//        randomOrderCommitments.add(new OrderCommitment(game.getYear(), game.getPhase(), randomOrder));
-//      }
-//
-//    }
-//
-//    BasicDeal deal = new BasicDeal(randomOrderCommitments, demilitarizedZones);
-//
-//
-//    return deal;
-
+    final Plan plan = this.dBraneTactics.determineBestPlan(this.game, this.me, dealCandidates, coalition);
+    if (Objects.nonNull(plan)) {
+      return orderCommitmentCandidate;
+    } else {
+      return null;
+    }
   }
 
 
