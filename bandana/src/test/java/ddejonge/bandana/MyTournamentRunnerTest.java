@@ -10,7 +10,7 @@ public class MyTournamentRunnerTest {
   @Test
   public void testRunTournamentOneOfSeven() throws IOException {
     MyTournamentRunner mtr = new MyTournamentRunner();
-    mtr.runTournament();
+    mtr.runTournament(3, 1920);
   }
 
   @Test

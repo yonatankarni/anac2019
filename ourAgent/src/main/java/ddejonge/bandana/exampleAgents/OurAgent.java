@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Vector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,11 +31,12 @@ import java.util.stream.Stream;
 public class OurAgent extends ANACNegotiator {
   DBraneTactics dBraneTactics;
 
+  private final Random random = new Random();
   private boolean sentSync = false;
   private final List<Power> coalition = new LinkedList<>();
   private int sameAgentCoalitionSize = 1;
   private Power champion = this.me;
-
+  private List<Power> coalitionCandidates = Collections.emptyList();
   //Constructor
 
   /**
@@ -76,6 +78,7 @@ public class OurAgent extends ANACNegotiator {
   public void negotiate(long negotiationDeadline) {
     BasicDeal newDealToPropose = null;
 
+    this.coalitionCandidates = new LinkedList<>(this.getNegotiatingPowers());
     //This loop repeats 2 steps. The first step is to handle any incoming messages,
     // while the second step tries to find deals to propose to the other negotiators.
     while (System.currentTimeMillis() < negotiationDeadline) {
@@ -224,6 +227,11 @@ public class OurAgent extends ANACNegotiator {
 
           DiplomacyProposal rejectedProposal = (DiplomacyProposal) receivedMessage.getContent();
 
+          // if some power rejects our deal - we remove them from the coalition candidates list for this round so that
+          // we don't make more deal offers in this negotiation round
+          Power coalitionCandidate = game.getPower(receivedMessage.getSender());
+          this.coalitionCandidates.remove(coalitionCandidate);
+
           // Some player has rejected a certain proposal.
           // This example agent doesn't do anything with such messages however.
 
@@ -325,6 +333,15 @@ public class OurAgent extends ANACNegotiator {
     final List<BasicDeal> finalDeals = new LinkedList<>(this.getConfirmedDeals());
 
     final List<Power> coalitionSorted = coalition.stream().sorted(Comparator.comparing(Power::getName)).collect(Collectors.toList());
+
+    // if the coalition size is too small, try to add a candidate to the coalition.
+    // if they reject a deal remove them from the list of coalition candidates for this negotiations round
+    if (coalition.size() < 3 && coalitionCandidates.size() > 0) {
+      final int randIdx = random.nextInt(coalitionCandidates.size());
+      Power coalitionCandidate = coalitionCandidates.get(randIdx);
+      coalitionSorted.add(coalitionCandidate);
+    }
+
     for (final Power power: coalitionSorted) {
       final Plan plan = this.dBraneTactics.determineBestPlan(this.game, power, finalDeals, coalition);
 
@@ -340,7 +357,7 @@ public class OurAgent extends ANACNegotiator {
             final Vector<Region> holdOrderAdjacentUnits = orderCandidate.getLocation().getAdjacentRegions();
             for (final Region adjacentRegion : holdOrderAdjacentUnits) {
               final Power controller = game.getController(adjacentRegion);
-              if (coalition.contains(controller) && !controller.equals(orderCandidate.getPower())) {
+              if (coalitionSorted.contains(controller) && !controller.equals(orderCandidate.getPower())) {
                 final SUPOrder supportMoveToOrderCandidate = new SUPOrder(controller, adjacentRegion, orderCandidate);
                 final OrderCommitment supportHoldOrderCommitment = getCommitmentIfOrderCoherent(supportMoveToOrderCandidate, finalOrderCommitments);
                 if (Objects.nonNull(supportHoldOrderCommitment)) {
@@ -356,7 +373,7 @@ public class OurAgent extends ANACNegotiator {
             for (final Region adjacentRegion : moveToDestinationAdjacentRegions) {
               final Power controller = game.getController(adjacentRegion);
 
-              if (coalition.contains(controller) && !controller.equals(orderCandidate.getPower())) {
+              if (coalitionSorted.contains(controller) && !controller.equals(orderCandidate.getPower())) {
                 final SUPMTOOrder supportMoveToOrderCandidate = new SUPMTOOrder(controller, adjacentRegion, (MTOOrder) orderCandidate);
                 final OrderCommitment supportMoveToOrderCommitment = getCommitmentIfOrderCoherent(supportMoveToOrderCandidate, finalOrderCommitments);
                 if (Objects.nonNull(supportMoveToOrderCommitment)) {
