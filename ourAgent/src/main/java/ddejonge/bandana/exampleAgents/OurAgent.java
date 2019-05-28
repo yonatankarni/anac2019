@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class OurAgent extends ANACNegotiator {
   DBraneTactics dBraneTactics;
@@ -96,10 +97,6 @@ public class OurAgent extends ANACNegotiator {
         String senderName = receivedMessage.getSender();
         Power senderPower = game.getPower(receivedMessage.getSender());
         if (receivedMessage.getPerformative().equals(DiplomacyNegoClient.ACCEPT)) {
-          if (!coalition.contains(senderPower)) {
-            coalition.add(senderPower);
-          }
-
           DiplomacyProposal acceptedProposal = (DiplomacyProposal) receivedMessage.getContent();
 
           this.getLogger().logln("ANACExampleNegotiator.negotiate() Received acceptance from " + senderName + ": " + acceptedProposal, true);
@@ -195,6 +192,14 @@ public class OurAgent extends ANACNegotiator {
 
           BasicDeal confirmedDeal = (BasicDeal) confirmedProposal.getProposedDeal();
 
+          final List<Power> distinctOtherPowers = confirmedDeal.getOrderCommitments().stream()
+            .flatMap(oc -> oc.getOrder().getPower().equals(this.me) ? Stream.empty() : Stream.of(oc.getOrder().getPower())).distinct().collect(Collectors.toList());
+
+          for (Power power : distinctOtherPowers) {
+            if (!coalition.contains(power)) {
+              coalition.add(power);
+            }
+          }
 
           //Reject any proposal that has not yet been confirmed and that is inconsistent with the confirmed deal.
           // NOTE that normally this is not really necessary because the Notary will already check that
