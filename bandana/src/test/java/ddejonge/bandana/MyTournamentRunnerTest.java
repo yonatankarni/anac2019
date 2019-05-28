@@ -14,8 +14,20 @@ public class MyTournamentRunnerTest {
   }
 
   @Test
+  public void testRunTournamentOneOfSevenLong() throws IOException {
+    MyTournamentRunner mtr = new MyTournamentRunner();
+    mtr.runTournament(20, 1905);
+  }
+
+  @Test
   public void testRunTournamentFourVsThree() throws IOException {
     TournamentRunnerFirstStage mtr = new TournamentRunnerFirstStage();
     mtr.runTournament();
+  }
+
+  @Test
+  public void testRunTournamentFourVsThreeLong() throws IOException {
+    TournamentRunnerFirstStage mtr = new TournamentRunnerFirstStage();
+    mtr.runTournament(20, 1917);
   }
 }
