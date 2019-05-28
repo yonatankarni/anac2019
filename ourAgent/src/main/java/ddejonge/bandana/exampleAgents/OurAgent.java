@@ -32,7 +32,7 @@ public class OurAgent extends ANACNegotiator {
   private boolean sentSync = false;
   private final List<Power> coalition = new LinkedList<>();
   private int sameAgentCoalitionSize = 1;
-  private Power champion;
+  private Power champion = this.me;
 
   //Constructor
 
@@ -94,7 +94,11 @@ public class OurAgent extends ANACNegotiator {
         Message receivedMessage = removeMessageFromQueue();
 
         String senderName = receivedMessage.getSender();
+        Power senderPower = game.getPower(receivedMessage.getSender());
         if (receivedMessage.getPerformative().equals(DiplomacyNegoClient.ACCEPT)) {
+          if (!coalition.contains(senderPower)) {
+            coalition.add(senderPower);
+          }
 
           DiplomacyProposal acceptedProposal = (DiplomacyProposal) receivedMessage.getContent();
 
@@ -120,7 +124,7 @@ public class OurAgent extends ANACNegotiator {
 
           // check if this is a sync proposal
           if (deal.getDemilitarizedZones().size() > 0 && deal.getDemilitarizedZones().get(0).getProvinces().size() == game.getProvinces().size()) {
-            coalition.add(game.getPower(receivedMessage.getSender()));
+            coalition.add(senderPower);
             sameAgentCoalitionSize++;
             this.rejectProposal(receivedProposal.getId());
             if (sameAgentCoalitionSize == 4) {
@@ -245,8 +249,6 @@ public class OurAgent extends ANACNegotiator {
 
       if (newDealToPropose == null) { //we only make one proposal per round, so we skip this if we have already proposed something.
         if (sameAgentCoalitionSize == 4) {
-//          System.out.println(String.format("%s -- %s",  this.me, champion));
-
           if (!this.me.equals(champion)) {
             continue;
           }
