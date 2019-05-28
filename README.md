@@ -31,3 +31,6 @@ to run just the first stage test (4 vs. 3), run:
 
 and to run just the second stage test run:
 * mvn test -pl bandana -Dtest=MyTournamentRunnerTest#testRunTournamentOneOfSeven
+
+to evaluate the first stage over 20 games run:
+* mvn test -pl bandana -Dtest=MyTournamentRunnerTest#testRunTournamentFourVsThreeLong
