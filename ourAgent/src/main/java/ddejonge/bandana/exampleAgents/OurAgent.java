@@ -12,25 +12,28 @@ import ddejonge.bandana.tools.Utilities;
 import ddejonge.negoServer.Message;
 import es.csic.iiia.fabregues.dip.board.Power;
 import es.csic.iiia.fabregues.dip.board.Region;
+import es.csic.iiia.fabregues.dip.orders.HLDOrder;
 import es.csic.iiia.fabregues.dip.orders.MTOOrder;
 import es.csic.iiia.fabregues.dip.orders.Order;
 import es.csic.iiia.fabregues.dip.orders.SUPMTOOrder;
-
+import es.csic.iiia.fabregues.dip.orders.SUPOrder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 public class OurAgent extends ANACNegotiator {
-
-  private Random random = new Random();
   DBraneTactics dBraneTactics;
 
   private boolean sentSync = false;
   private final List<Power> coalition = new LinkedList<>();
+  private int sameAgentCoalitionSize = 1;
+  private Power champion;
+
   //Constructor
 
   /**
@@ -71,7 +74,6 @@ public class OurAgent extends ANACNegotiator {
   @Override
   public void negotiate(long negotiationDeadline) {
     BasicDeal newDealToPropose = null;
-
 
     //This loop repeats 2 steps. The first step is to handle any incoming messages,
     // while the second step tries to find deals to propose to the other negotiators.
@@ -117,9 +119,16 @@ public class OurAgent extends ANACNegotiator {
           BasicDeal deal = (BasicDeal) receivedProposal.getProposedDeal();
 
           // check if this is a sync proposal
-          if (deal.getDemilitarizedZones().size() == game.getProvinces().size()) {
+          if (deal.getDemilitarizedZones().size() > 0 && deal.getDemilitarizedZones().get(0).getProvinces().size() == game.getProvinces().size()) {
             coalition.add(game.getPower(receivedMessage.getSender()));
+            sameAgentCoalitionSize++;
             this.rejectProposal(receivedProposal.getId());
+            if (sameAgentCoalitionSize == 4) {
+              final List<Power> coalitionAndMe = new LinkedList<>(coalition);
+              coalitionAndMe.add(me);
+              champion = coalitionAndMe.stream().max(Comparator.comparing(Power::getName)).get();
+              System.out.println(String.format("champion for %s is %s", this.me, champion));
+            }
             continue;
           }
 
@@ -159,8 +168,7 @@ public class OurAgent extends ANACNegotiator {
           String consistencyReport = null;
           if (!outDated) {
 
-            List<BasicDeal> commitments = new ArrayList<BasicDeal>();
-            commitments.addAll(this.getConfirmedDeals());
+            List<BasicDeal> commitments = new ArrayList<>(this.getConfirmedDeals());
             commitments.add(deal);
             consistencyReport = Utilities.testConsistency(game, commitments);
           }
@@ -230,27 +238,38 @@ public class OurAgent extends ANACNegotiator {
         final DMZ dmz = new DMZ(game.getYear(), game.getPhase(), game.getPowers(), game.getProvinces());
         BasicDeal syncDeal = new BasicDeal(orderCommitments, Collections.singletonList(dmz));
         this.proposeDeal(syncDeal);
+        continue;
       }
 
       //STEP 2:  try to find a proposal to make, and if we do find one, propose it.
 
       if (newDealToPropose == null) { //we only make one proposal per round, so we skip this if we have already proposed something.
+        if (sameAgentCoalitionSize == 4) {
+//          System.out.println(String.format("%s -- %s",  this.me, champion));
+
+          if (!this.me.equals(champion)) {
+            continue;
+          }
+          System.out.println(String.format("I am the champion! (%s)", champion.getName()));
+        }
+
         newDealToPropose = searchForNewDealToPropose();
 
         if (newDealToPropose != null) {
-
-          this.getLogger().logln("ANACExampleNegotiator.negotiate() Proposing: " + newDealToPropose, true);
-          this.proposeDeal(newDealToPropose);
-
+          long distinctPowerCount = newDealToPropose.getOrderCommitments().stream().map(c -> c.getOrder().getPower()).distinct().count();
+          if (distinctPowerCount > 1) {
+            this.getLogger().logln("ANACExampleNegotiator.negotiate() Proposing: " + newDealToPropose, true);
+            this.proposeDeal(newDealToPropose);
+          } else {
+            newDealToPropose = null;
+          }
         }
       }
 
       try {
         Thread.sleep(250);
-      } catch (InterruptedException e) {
+      } catch (InterruptedException ignored) {
       }
-
-
     }
 
   //whenever you like, you can also propose a draw to all other surviving players:
@@ -263,7 +282,6 @@ public class OurAgent extends ANACNegotiator {
 
 
   private BasicDeal searchForNewDealToPropose() {
-
     //Get a copy of our list of current commitments.
     List<BasicDeal> commitments = this.getConfirmedDeals();
 
@@ -272,7 +290,6 @@ public class OurAgent extends ANACNegotiator {
 
     //add it to the list containing our existing commitments so that dBraneTactics can determine a plan.
     commitments.add(dealCandidate);
-
 
     //Ask the D-Brane Tactical Module what it would do under these commitments.
     final Plan plan = this.dBraneTactics.determineBestPlan(game, me, commitments);
@@ -286,6 +303,8 @@ public class OurAgent extends ANACNegotiator {
 
 
   private BasicDeal generateDealCandidate() {
+    this.getLogger().logln("entering generateDealCandidate");
+
     //Get the names of all the powers that are connected to the negotiation server and which have not been eliminated.
     List<Power> aliveNegotiatingPowers = this.getNegotiatingPowers();
 
@@ -298,7 +317,8 @@ public class OurAgent extends ANACNegotiator {
     final List<OrderCommitment> finalOrderCommitments = new ArrayList<>();
     final List<BasicDeal> finalDeals = new LinkedList<>(this.getConfirmedDeals());
 
-    for (final Power power: aliveNegotiatingPowers) {
+    final List<Power> coalitionSorted = coalition.stream().sorted(Comparator.comparing(Power::getName)).collect(Collectors.toList());
+    for (final Power power: coalitionSorted) {
       final Plan plan = this.dBraneTactics.determineBestPlan(this.game, power, finalDeals, coalition);
 
       if (Objects.nonNull(plan)) {
@@ -309,9 +329,24 @@ public class OurAgent extends ANACNegotiator {
             finalOrderCommitments.add(orderCommitment);
           }
 
+          if (orderCandidate instanceof HLDOrder && orderCandidate.getLocation().getProvince().isSC()) {
+            final Vector<Region> holdOrderAdjacentUnits = orderCandidate.getLocation().getAdjacentRegions();
+            for (final Region adjacentRegion : holdOrderAdjacentUnits) {
+              final Power controller = game.getController(adjacentRegion);
+              if (coalition.contains(controller) && !controller.equals(orderCandidate.getPower())) {
+                final SUPOrder supportMoveToOrderCandidate = new SUPOrder(controller, adjacentRegion, orderCandidate);
+                final OrderCommitment supportHoldOrderCommitment = getCommitmentIfOrderCoherent(supportMoveToOrderCandidate, finalOrderCommitments);
+                if (Objects.nonNull(supportHoldOrderCommitment)) {
+                  finalOrderCommitments.add(supportHoldOrderCommitment);
+                  break;
+                }
+              }
+            }
+          }
+
           if (orderCandidate instanceof MTOOrder && orderCandidate.getLocation().getProvince().isSC()) {
-            final Vector<Region> adjacentRegions = ((MTOOrder) orderCandidate).getDestination().getAdjacentRegions();
-            for (final Region adjacentRegion : adjacentRegions) {
+            final Vector<Region> moveToDestinationAdjacentRegions = ((MTOOrder) orderCandidate).getDestination().getAdjacentRegions();
+            for (final Region adjacentRegion : moveToDestinationAdjacentRegions) {
               final Power controller = game.getController(adjacentRegion);
 
               if (coalition.contains(controller) && !controller.equals(orderCandidate.getPower())) {

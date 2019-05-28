@@ -112,7 +112,6 @@ public class TournamentResult {
 	}
 	
 	public ArrayList<String> sortNames(final ArrayList<ScoreCalculator> scoreCalculators){
-		
 		ArrayList<String> sortedNames = new ArrayList<String>(names);
 		
 		Collections.sort(sortedNames, new Comparator<String>() {

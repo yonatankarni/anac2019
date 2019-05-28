@@ -13,29 +13,27 @@ public class MyTournamentRunner {
 
   //Command lines to start the various agents provided with the Bandana framework.
   // Add your own line here to run your own bot.
-  final static String[] randomNegotiatorCommand = {"java", "-jar", "agents/RandomNegotiator.jar", "-log", "log", "-name", "RandomNegotiator", "-fy", "1905"};
-  final static String[] dumbBot_1_4_Command = {"java", "-jar", "agents/DumbBot-1.4.jar", "-log", "log", "-name", "DumbBot", "-fy", "1905"};
-  final static String[] dbrane_1_1_Command = {"java", "-jar", "agents/D-Brane-1.1.jar", "-log", "log", "-name", "D-Brane", "-fy", "1905"};
-  final static String[] dbraneExampleBotCommand = {"java", "-jar", "agents/D-BraneExampleBot.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1905"};
+  private static final String[] randomNegotiatorCommand = {"java", "-jar", "agents/RandomNegotiator.jar", "-log", "log", "-name", "RandomNegotiator", "-fy", "1905"};
+  private static final String[] dumbBot_1_4_Command = {"java", "-jar", "agents/DumbBot-1.4.jar", "-log", "log", "-name", "DumbBot", "-fy", "1905"};
+  static final String[] dbrane_1_1_Command = {"java", "-jar", "agents/D-Brane-1.1.jar", "-log", "log", "-name", "D-Brane", "-fy", "1905"};
+  private static final String[] dbraneExampleBotCommand = {"java", "-jar", "agents/D-BraneExampleBot.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1905"};
 
-  final static String[] ourAgentCommand = {"java", "-jar", "agents/ourAgent-spring-boot.jar", "-log", "log", "-name", "ourAgent", "-fy", "1905"};
-  final static String[] ourAgentCommandWithDebug = {"java", "-jar", "-agentlib:jdwp=transport=dt_socket,server=y,address=5005", "agents/ourAgent-spring-boot.jar", "-log", "log", "-name", "ourAgent", "-fy", "1905"};
+  static final String[] ourAgentCommand = {"java", "-jar", "agents/ourAgent-spring-boot.jar", "-log", "log", "-name", "ourAgent", "-fy", "1905"};
+  static final String[] ourAgentCommandWithDebug = {"java", "-jar", "-agentlib:jdwp=transport=dt_socket,server=y,address=5005", "agents/ourAgent-spring-boot.jar", "-log", "log", "-name", "ourAgent", "-fy", "1905"};
 
   //Main folder where all the logs are stored. For each tournament a new folder will be created inside this folder
   // where the results of the tournament will be logged.
-  final String LOG_FOLDER = "log";
+  private final String LOG_FOLDER = "log";
 
 
   public void runTournament() throws IOException {
+    this.runTournament(3, 1905);
+  }
 
-    int numberOfGames = 3;        //The number of games this tournament consists of.
-
+  public void runTournament(final int numberOfGames, final int finalYear) throws IOException {
     int deadlineForMovePhases = 60;  //60 seconds for each SPR and FAL phases
     int deadlineForRetreatPhases = 30;  //30 seconds for each SUM and AUT phases
     int deadlineForBuildPhases = 30;    //30 seconds for each WIN phase
-
-    int finalYear = 1905;  //The year after which the agents in each game are supposed to propose a draw to each other.
-    // (It depends on the implementation of the players whether this will indeed happen or not, so this may not always work.)
 
     run(numberOfGames, deadlineForMovePhases, deadlineForRetreatPhases, deadlineForBuildPhases, finalYear);
     Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -52,9 +50,9 @@ public class MyTournamentRunner {
   }
 
 
-  static List<Process> players = new ArrayList<Process>();
+  private static List<Process> players = new ArrayList<Process>();
 
-  public void run(int numberOfGames, int moveTimeLimit, int retreatTimeLimit, int buildTimeLimit, int finalYear) throws IOException {
+  private void run(int numberOfGames, int moveTimeLimit, int retreatTimeLimit, int buildTimeLimit, int finalYear) throws IOException {
 
     //Create a folder to store all the results of the tournament.
     // This folder will be placed inside the LOG_FOLDER and will have the current date and time as its name.
@@ -75,7 +73,7 @@ public class MyTournamentRunner {
     scoreCalculators.add(new RankCalculator());
 
     //2. Create a TournamentObserver to monitor the games and accumulate the results.
-    TournamentObserver tournamentObserver = new TournamentObserver(tournamentLogFolderPath, scoreCalculators, numberOfGames, 7);
+    MyTournamentObserver tournamentObserver = new MyTournamentObserver(tournamentLogFolderPath, scoreCalculators, numberOfGames, 7);
 
     //3. Run the Negotiation Server.
     NegoServerRunner.run(tournamentObserver, tournamentLogFolderPath, numberOfGames);
