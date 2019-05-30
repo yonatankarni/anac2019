@@ -21,7 +21,7 @@
 
   <modules>
     <module>bandana</module>
-    <module>ourAgent</module>
+    <module>biu3141Negotiator</module>
   </modules>
 
   <repositories>

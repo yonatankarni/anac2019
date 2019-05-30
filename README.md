@@ -18,7 +18,7 @@ run the TournamentRunner.main() and voilla.
 run the following from the project root dir:
 
 * mvn initialize
-* mvn clean install -pl ourAgent
+* mvn clean install -pl biu3141Negotiator
 * mvn clean install
 
 in order to debug the agent, replace the last step with:

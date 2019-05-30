@@ -3,7 +3,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>ourAgent</artifactId>
+  <artifactId>biu3141Negotiator</artifactId>
 
   <parent>
     <groupId>org.biu.anac</groupId>
@@ -21,7 +21,7 @@
           <archive>
             <manifest>
               <classpathPrefix>lib/</classpathPrefix>
-              <mainClass>ddejonge.bandana.exampleAgents.OurAgentMain</mainClass>
+              <mainClass>ddejonge.bandana.exampleAgents.Biu3141NegotiatorMain</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -36,7 +36,7 @@
             </goals>
             <configuration>
               <outputDirectory>../bandana/agents</outputDirectory>
-              <finalName>ourAgent</finalName>
+              <finalName>biu3141Negotiator</finalName>
               <classifier>spring-boot</classifier>
             </configuration>
           </execution>

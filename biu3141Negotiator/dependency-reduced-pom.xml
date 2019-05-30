@@ -6,7 +6,7 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>ourAgent</artifactId>
+  <artifactId>biu3141Negotiator</artifactId>
   <build>
     <plugins>
       <plugin>
@@ -16,7 +16,7 @@
           <outputDirectory>../bandana/agents</outputDirectory>
           <archive>
             <manifest>
-              <mainClass>ddejonge.bandana.exampleAgents.OurAgentMain</mainClass>
+              <mainClass>ddejonge.bandana.exampleAgents.Biu3141NegotiatorMain</mainClass>
             </manifest>
           </archive>
         </configuration>

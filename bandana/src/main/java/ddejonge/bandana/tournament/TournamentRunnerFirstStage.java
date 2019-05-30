@@ -11,15 +11,15 @@ public class TournamentRunnerFirstStage extends MyTournamentRunner {
 
     //make sure that each player has a different name.
     if (playerIdx < 1) {
-      name = "OurAgent" + playerIdx;
+      name = "biu3141Negotiator" + playerIdx;
       if ("true".equals(System.getProperty("debug"))) {
-        command = ourAgentCommandWithDebug;
+        command = biu3141NegotiatorCommandWithDebug;
       } else {
-        command = ourAgentCommand;
+        command = biu3141NegotiatorCommand;
       }
     } else if (playerIdx < 4) {
-      name = "OurAgent" + playerIdx;
-      command = ourAgentCommand;
+      name = "Biu3141Negotiator" + playerIdx;
+      command = biu3141NegotiatorCommand;
     } else {
       name = "D-Brane " + playerIdx;
       command = dbrane_1_1_Command;

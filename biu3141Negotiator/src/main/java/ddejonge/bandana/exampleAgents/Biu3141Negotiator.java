@@ -28,7 +28,7 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class OurAgent extends ANACNegotiator {
+public class Biu3141Negotiator extends ANACNegotiator {
   DBraneTactics dBraneTactics;
 
   private final Random random = new Random();
@@ -46,7 +46,7 @@ public class OurAgent extends ANACNegotiator {
    *
    * @param args
    */
-  public OurAgent(String[] args) {
+  public Biu3141Negotiator(String[] args) {
     super(args);
 
     dBraneTactics = this.getTacticalModule();

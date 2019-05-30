@@ -18,8 +18,8 @@ public class MyTournamentRunner {
   static final String[] dbrane_1_1_Command = {"java", "-jar", "agents/D-Brane-1.1.jar", "-log", "log", "-name", "D-Brane", "-fy", "1905"};
   private static final String[] dbraneExampleBotCommand = {"java", "-jar", "agents/D-BraneExampleBot.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1905"};
 
-  static final String[] ourAgentCommand = {"java", "-jar", "agents/ourAgent-spring-boot.jar", "-log", "log", "-name", "ourAgent", "-fy", "1905"};
-  static final String[] ourAgentCommandWithDebug = {"java", "-jar", "-agentlib:jdwp=transport=dt_socket,server=y,address=5005", "agents/ourAgent-spring-boot.jar", "-log", "log", "-name", "ourAgent", "-fy", "1905"};
+  static final String[] biu3141NegotiatorCommand = {"java", "-jar", "agents/biu3141Negotiator-spring-boot.jar", "-log", "log", "-name", "biu3141Negotiator", "-fy", "1905"};
+  static final String[] biu3141NegotiatorCommandWithDebug = {"java", "-jar", "-agentlib:jdwp=transport=dt_socket,server=y,address=5005", "agents/biu3141Negotiator-spring-boot.jar", "-log", "log", "-name", "biu3141Negotiator", "-fy", "1905"};
 
   //Main folder where all the logs are stored. For each tournament a new folder will be created inside this folder
   // where the results of the tournament will be logged.
@@ -142,11 +142,11 @@ public class MyTournamentRunner {
 
     //make sure that each player has a different name.
     if (playerIdx < 1) {
-      name = "OurAgent" + playerIdx;
+      name = "biu3141Negotiator" + playerIdx;
       if ("true".equals(System.getProperty("debug"))) {
-        command = ourAgentCommandWithDebug;
+        command = biu3141NegotiatorCommandWithDebug;
       } else {
-        command = ourAgentCommand;
+        command = biu3141NegotiatorCommand;
       }
     } else if (playerIdx < 2) {
       name = "D-Brane " + playerIdx;
